@@ -1,71 +1,96 @@
-# Inventario Mercado Municipal de Quevedo
+# inventario-mercado-zamora
 
-**Estudiante:** Zamora Arias Carla Esthefania  
-**Asignatura:** Aplicaciones Web — Ingeniería de Software (UTEQ)  
-**Proyecto:** inventario-mercado-zamora  
+## Datos del estudiante
 
-Java 21 · Spring Boot 3.4.1 · PostgreSQL · Redis · JWT
+- **Apellidos y nombres:** Zamora Arias Carla Esthefania
+- **Asignatura:** Aplicaciones Web
+- **Carrera:** Ingeniería de Software (Rediseño) — UTEQ
+- **Nivel:** Quinto
+- **Periodo:** Académico Presencial 2026-2027 (PPA)
+- **Proyecto:** Sistema de gestión de inventario del Mercado Municipal de Quevedo
 
-## Requisitos
+## Versiones
 
-- JDK 21
-- PostgreSQL
-- Redis (puerto 6379)
-- IntelliJ IDEA
+- **Java:** 21 LTS
+- **Spring Boot:** 3.4.1
+- **PostgreSQL:** 16
+- **Redis:** 7
 
-## Base de datos
+## Requisitos previos
 
-```sql
-CREATE DATABASE inventario;
+- Docker Desktop
+- Git
+
+## Arranque (un solo comando)
+
+```bash
+git clone https://github.com/<usuario>/inventario-mercado-zamora.git
+cd inventario-mercado-zamora
+cp .env.example .env
+docker compose up -d --build
 ```
 
-Ejecutar `db/schema.sql` y `db/seed.sql` en la base `inventario`.
+API local: http://localhost:8080/api/v1/productos
 
-Ajustar clave en `src/main/resources/application.yml`:
+## Usuarios semilla y token JWT
 
-```yaml
-spring:
-  datasource:
-    username: postgres
-    password: TU_CLAVE
-```
+| Usuario | Contraseña | Rol         |
+|---------|------------|-------------|
+| user    | user123    | ROLE_USER   |
+| admin   | admin123   | ROLE_ADMIN  |
 
-## Ejecutar
-
-Abrir el proyecto en IntelliJ y correr `InventarioMercadoZamoraApplication`.
-
-API: http://localhost:8080
-
-## Usuarios
-
-| Usuario | Clave    | Rol         |
-|---------|----------|-------------|
-| user    | user123  | ROLE_USER   |
-| admin   | admin123 | ROLE_ADMIN  |
-
-Login:
+Obtener el token:
 
 ```http
 POST http://localhost:8080/api/v1/auth/login
 Content-Type: application/json
 
-{ "username": "admin", "password": "admin123" }
+{
+  "username": "admin",
+  "password": "admin123"
+}
 ```
 
-Header:
+Usar el token en las peticiones:
 
 ```http
 Authorization: Bearer <token>
 ```
 
-- GET `/api/v1/productos` → ROLE_USER o ROLE_ADMIN
-- POST / DELETE → ROLE_ADMIN
-- Sin token → 401
-- Rol insuficiente → 403
+- `GET /api/v1/productos` requiere `ROLE_USER` (también válido con `ROLE_ADMIN`)
+- `POST /api/v1/productos` y `DELETE /api/v1/productos/{id}` requieren `ROLE_ADMIN`
+- Sin token → HTTP 401
+- Token válido con rol insuficiente → HTTP 403
 
-Pruebas: `docs/requests.http`
+## Cómo probar los cinco requisitos
 
-## Informe LaTeX
+Colección: `docs/requests.http`
+
+1. **Listado paginado**  
+   `GET /api/v1/productos?page=0&size=10&sort=nombre,asc` con token USER o ADMIN.  
+   Respuesta con `{success, data, message, meta}`.
+
+2. **Creación validada**  
+   `POST /api/v1/productos` con token ADMIN y body válido → 201.  
+   Body inválido → 400 con errores por campo.
+
+3. **Eliminación lógica**  
+   `DELETE /api/v1/productos/{id}` con token ADMIN → soft delete (`activo=false`).  
+   Id inexistente → 404.
+
+4. **Cache-aside con Redis**  
+   Llamar dos veces al GET: la segunda responde desde Redis (`@Cacheable`).  
+   Tras POST o DELETE se invalida la caché (`@CacheEvict`).
+
+5. **Seguridad JWT**  
+   GET sin token → 401.  
+   POST con token de `ROLE_USER` → 403.
+
+## Compilación del informe LaTeX (criterio P2)
+
+Archivo principal: `docs/informe/informe.tex`  
+Bibliografía: `docs/informe/referencias.bib`  
+Motor: `pdflatex` · Procesador: `bibtex` · Pasadas: 4
 
 ```bash
 cd docs/informe
@@ -73,11 +98,4 @@ pdflatex informe
 bibtex informe
 pdflatex informe
 pdflatex informe
-```
-
-## Docker (opcional)
-
-```bash
-cp .env.example .env
-docker compose up -d --build
 ```
