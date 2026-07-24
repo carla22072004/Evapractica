@@ -3,6 +3,7 @@ package ec.edu.uteq.inventario.service;
 import ec.edu.uteq.inventario.domain.Producto;
 import ec.edu.uteq.inventario.dto.ApiResponse;
 import ec.edu.uteq.inventario.dto.PageMeta;
+import ec.edu.uteq.inventario.dto.ProductoRequest;
 import ec.edu.uteq.inventario.dto.ProductoResponse;
 import ec.edu.uteq.inventario.mapper.ProductoMapper;
 import ec.edu.uteq.inventario.repository.ProductoRepository;
@@ -36,5 +37,11 @@ public class ProductoService {
         );
 
         return ApiResponse.ok(data, "Listado obtenido correctamente", meta);
+    }
+
+    @Transactional
+    public ApiResponse<ProductoResponse> crear(ProductoRequest request) {
+        Producto guardado = productoRepository.save(ProductoMapper.toEntity(request));
+        return ApiResponse.ok(ProductoMapper.toResponse(guardado), "Producto creado correctamente");
     }
 }

@@ -10,7 +10,7 @@
 | Parte | Estado | Contenido |
 |-------|--------|-----------|
 | 1 | Lista | Base + entidad Producto + GET paginado |
-| 2 | Pendiente | POST con validación y 400 |
+| 2 | Lista | POST con validación y 400 |
 | 3 | Pendiente | DELETE soft + cache Redis |
 | 4 | Pendiente | JWT + entrega (informe LaTeX, requests) |
 
