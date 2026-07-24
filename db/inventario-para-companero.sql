@@ -1,16 +1,7 @@
--- ============================================================
--- Script para compartir: BD inventario (Mercado Quevedo)
--- Estudiante: Zamora Arias Carla Esthefania
--- ============================================================
--- COMO USARLO (tu companero):
--- 1. Abrir pgAdmin o psql
--- 2. Conectarse como postgres
--- 3. Ejecutar primero:
---      CREATE DATABASE inventario;
--- 4. Conectarse a la BD inventario
--- 5. Ejecutar este archivo completo
--- ============================================================
+-- Crear antes: CREATE DATABASE inventario;
+-- Luego ejecutar este script conectado a inventario.
 
+DROP TABLE IF EXISTS usuarios CASCADE;
 DROP TABLE IF EXISTS productos CASCADE;
 
 CREATE TABLE productos (
@@ -21,6 +12,14 @@ CREATE TABLE productos (
     precio      DECIMAL(10, 2) NOT NULL CHECK (precio >= 0.01),
     activo      BOOLEAN      NOT NULL DEFAULT TRUE,
     creado_en   TIMESTAMPTZ  NOT NULL DEFAULT now()
+);
+
+CREATE TABLE usuarios (
+    id       BIGSERIAL PRIMARY KEY,
+    username VARCHAR(50)  NOT NULL UNIQUE,
+    password VARCHAR(100) NOT NULL,
+    rol      VARCHAR(30)  NOT NULL,
+    activo   BOOLEAN      NOT NULL DEFAULT TRUE
 );
 
 INSERT INTO productos (id, nombre, categoria, stock, precio, activo, creado_en) VALUES

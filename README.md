@@ -2,60 +2,82 @@
 
 **Estudiante:** Zamora Arias Carla Esthefania  
 **Asignatura:** Aplicaciones Web — Ingeniería de Software (UTEQ)  
-**Proyecto:** `inventario-mercado-zamora`  
-**Stack:** Java 21 LTS · Spring Boot 3.4.1 · PostgreSQL · Redis (Parte 3)
+**Proyecto:** inventario-mercado-zamora  
 
-## Partes del desarrollo
+Java 21 · Spring Boot 3.4.1 · PostgreSQL · Redis · JWT
 
-| Parte | Estado | Contenido |
-|-------|--------|-----------|
-| 1 | Lista | Base + entidad Producto + GET paginado |
-| 2 | Lista | POST con validación y 400 |
-| 3 | Lista | DELETE soft + cache Redis |
-| 4 | Pendiente | JWT + entrega (informe LaTeX, requests) |
+## Requisitos
 
-## Ejecutar en IntelliJ IDEA (recomendado)
-
-### 1. Requisitos
+- JDK 21
+- PostgreSQL
+- Redis (puerto 6379)
 - IntelliJ IDEA
-- JDK **21** (File → Project Structure → SDK)
-- PostgreSQL local (ya detectado: servicio `postgresql-x64-18`)
 
-### 2. Crear la base de datos
-En pgAdmin o en la terminal de PostgreSQL:
+## Base de datos
 
 ```sql
 CREATE DATABASE inventario;
 ```
 
-### 3. Credenciales
-Edita `src/main/resources/application.yml` si tu usuario/clave no son `postgres` / `postgres`:
+Ejecutar `db/schema.sql` y `db/seed.sql` en la base `inventario`.
+
+Ajustar clave en `src/main/resources/application.yml`:
 
 ```yaml
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/inventario
     username: postgres
     password: TU_CLAVE
 ```
 
-### 4. Abrir y correr
-1. File → Open → carpeta `c:\carla`
-2. Espera a que IntelliJ indexe y descargue Maven
-3. Abre `InventarioMercadoZamoraApplication`
-4. Run ▶
+## Ejecutar
 
-API: http://localhost:8080/api/v1/productos
+Abrir el proyecto en IntelliJ y correr `InventarioMercadoZamoraApplication`.
 
-### 5. Probar GET (Parte 1)
+API: http://localhost:8080
+
+## Usuarios
+
+| Usuario | Clave    | Rol         |
+|---------|----------|-------------|
+| user    | user123  | ROLE_USER   |
+| admin   | admin123 | ROLE_ADMIN  |
+
+Login:
 
 ```http
-GET http://localhost:8080/api/v1/productos?page=0&size=10&sort=nombre,asc
+POST http://localhost:8080/api/v1/auth/login
+Content-Type: application/json
+
+{ "username": "admin", "password": "admin123" }
 ```
 
-También está en `docs/requests.http` (plugin HTTP Client de IntelliJ).
+Header:
 
-## Nota Redis (Parte 3)
+```http
+Authorization: Bearer <token>
+```
 
-Redis para Windows ya quedó instalado como servicio (`Redis` en servicios de Windows), puerto **6379**.
-La app usa cache-aside: `@Cacheable` en el listado y `@CacheEvict` al crear/eliminar.
+- GET `/api/v1/productos` → ROLE_USER o ROLE_ADMIN
+- POST / DELETE → ROLE_ADMIN
+- Sin token → 401
+- Rol insuficiente → 403
+
+Pruebas: `docs/requests.http`
+
+## Informe LaTeX
+
+```bash
+cd docs/informe
+pdflatex informe
+bibtex informe
+pdflatex informe
+pdflatex informe
+```
+
+## Docker (opcional)
+
+```bash
+cp .env.example .env
+docker compose up -d --build
+```

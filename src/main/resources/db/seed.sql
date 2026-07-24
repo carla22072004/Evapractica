@@ -15,3 +15,11 @@ FROM (VALUES
     ('Producto inactivo demo', 'Otros', 5, 1.00::numeric, FALSE)
 ) AS v(nombre, categoria, stock, precio, activo)
 WHERE NOT EXISTS (SELECT 1 FROM productos LIMIT 1);
+
+INSERT INTO usuarios (username, password, rol, activo)
+SELECT 'user', '$2b$10$0wq86GLRYM4wDnVPV62Tu.pi7tdMWE8cusqU1XXNtKpsNIdD.7N8S', 'ROLE_USER', TRUE
+WHERE NOT EXISTS (SELECT 1 FROM usuarios WHERE username = 'user');
+
+INSERT INTO usuarios (username, password, rol, activo)
+SELECT 'admin', '$2b$10$oqVIdgKmP3HaqIvTXUkMnuFE07F5DHi0iCe6ulh2kzKQfYteSNEDu', 'ROLE_ADMIN', TRUE
+WHERE NOT EXISTS (SELECT 1 FROM usuarios WHERE username = 'admin');

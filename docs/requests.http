@@ -1,23 +1,42 @@
-### Parte 1 — GET paginado
-GET http://localhost:8080/api/v1/productos?page=0&size=10&sort=nombre,asc
-Accept: application/json
-
-### Parte 2 — POST valido
-POST http://localhost:8080/api/v1/productos
+### Login USER
+POST http://localhost:8080/api/v1/auth/login
 Content-Type: application/json
-Accept: application/json
 
 {
-  "nombre": "Maiz suave",
-  "categoria": "Granos",
-  "stock": 40,
-  "precio": 0.75
+  "username": "user",
+  "password": "user123"
 }
 
-### Parte 2 — POST invalido (debe devolver 400)
-POST http://localhost:8080/api/v1/productos
+### Login ADMIN
+POST http://localhost:8080/api/v1/auth/login
 Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin123"
+}
+
+### GET productos
+GET http://localhost:8080/api/v1/productos?page=0&size=10&sort=nombre,asc
+Authorization: Bearer {{tokenUser}}
 Accept: application/json
+
+### POST producto
+POST http://localhost:8080/api/v1/productos
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: application/json
+
+{
+  "nombre": "Yuca fresca",
+  "categoria": "Verduras",
+  "stock": 50,
+  "precio": 0.60
+}
+
+### POST invalido
+POST http://localhost:8080/api/v1/productos
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: application/json
 
 {
   "nombre": "",
@@ -26,14 +45,25 @@ Accept: application/json
   "precio": 0
 }
 
-### Parte 3 — DELETE soft (usa un id real)
-DELETE http://localhost:8080/api/v1/productos/13
-Accept: application/json
+### DELETE producto
+DELETE http://localhost:8080/api/v1/productos/1
+Authorization: Bearer {{tokenAdmin}}
 
-### Parte 3 — DELETE id inexistente (debe devolver 404)
+### DELETE inexistente
 DELETE http://localhost:8080/api/v1/productos/9999
-Accept: application/json
+Authorization: Bearer {{tokenAdmin}}
 
-### Parte 3 — GET (segunda llamada deberia salir de cache Redis)
-GET http://localhost:8080/api/v1/productos?page=0&size=10&sort=nombre,asc
-Accept: application/json
+### GET sin token
+GET http://localhost:8080/api/v1/productos?page=0&size=10
+
+### POST con rol insuficiente
+POST http://localhost:8080/api/v1/productos
+Authorization: Bearer {{tokenUser}}
+Content-Type: application/json
+
+{
+  "nombre": "No permitido",
+  "categoria": "Otros",
+  "stock": 1,
+  "precio": 1.00
+}

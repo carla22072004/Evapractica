@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 class InventarioMercadoZamoraApplicationTests {
 
     @Test
-    void placeholder() {
-        // Tests de integracion se agregan cuando la API este completa (Parte 4).
+    void contextLoads() {
     }
 }

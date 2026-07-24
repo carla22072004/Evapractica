@@ -1,0 +1,56 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\geometry{margin=2.5cm}
+
+\title{Informe t\'ecnico\\Sistema de gesti\'on de inventario\\Mercado Municipal de Quevedo}
+\author{Zamora Arias Carla Esthefania\\Ingenier\'ia de Software --- UTEQ\\Aplicaciones Web}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Se presenta la implementaci\'on de una API REST con Spring Boot 3 (Java 21) para el control de productos del Mercado Municipal de Quevedo. El servicio expone recursos paginados con contrato JSON uniforme, validaci\'on de entrada, borrado l\'ogico, cach\'e cache-aside con Redis y seguridad basada en JWT.
+\end{abstract}
+
+\section{Introducci\'on}
+El m\'odulo de inventario digitaliza el control de productos mediante una arquitectura por capas (controlador, servicio, repositorio), alineada a las Unidades III y IV de la asignatura \cite{walls2022,martin2017}.
+
+\section{Arquitectura}
+\begin{itemize}
+  \item \textbf{Controlador:} endpoints REST delgados.
+  \item \textbf{Servicio:} reglas de negocio, cach\'e e invalidaci\'on.
+  \item \textbf{Repositorio:} acceso exclusivo a PostgreSQL con Spring Data JPA.
+\end{itemize}
+
+\section{Modelo de datos}
+La entidad \texttt{Producto} incluye \texttt{id}, \texttt{nombre}, \texttt{categoria}, \texttt{stock}, \texttt{precio}, \texttt{activo} y \texttt{creadoEn} (\texttt{TIMESTAMPTZ}). La eliminaci\'on es l\'ogica (\texttt{activo=false}).
+
+\section{Requisitos implementados}
+\begin{enumerate}
+  \item \texttt{GET /api/v1/productos} paginado con envoltura \texttt{\{success, data, message, meta\}}.
+  \item \texttt{POST /api/v1/productos} con \texttt{@Valid} y respuesta 400 por campo.
+  \item \texttt{DELETE /api/v1/productos/\{id\}} con soft delete y 404.
+  \item Cache-aside Redis: \texttt{@Cacheable} / \texttt{@CacheEvict} \cite{kleppmann2017}.
+  \item JWT: \texttt{ROLE\_USER} (GET), \texttt{ROLE\_ADMIN} (POST/DELETE), c\'odigos 401/403 \cite{rfc7519}.
+\end{enumerate}
+
+\section{Seguridad}
+Se usa un filtro Bearer que valida el token. El login (\texttt{POST /api/v1/auth/login}) emite JWT firmado. El secreto se configura por variable de entorno \texttt{JWT\_SECRET} y no se versiona en claro.
+
+\section{Evidencias de prueba}
+Las pruebas se documentan en \texttt{docs/requests.http} y capturas en \texttt{docs/capturas/} (200, 400, 401, 403, 404, cache hit/miss).
+
+\section{Conclusiones}
+La API cumple el contrato del examen parcial: es reproducible, segura con JWT y acelera lecturas con Redis, consolidando persistencia, patrones y servicios REST.
+
+\bibliographystyle{plain}
+\bibliography{referencias}
+\end{document}
