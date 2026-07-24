@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: inventario-mercado-zamora
+  datasource:
+    url: jdbc:postgresql://localhost:5432/inventario
+    username: postgres
+    password: "1234"
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+    defer-datasource-initialization: true
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: America/Guayaquil
+  sql:
+    init:
+      mode: never
+
+server:
+  port: 8080
+
+logging:
+  level:
+    ec.edu.uteq.inventario: INFO
