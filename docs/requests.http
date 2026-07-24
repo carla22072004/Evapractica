@@ -25,3 +25,15 @@ Accept: application/json
   "stock": -1,
   "precio": 0
 }
+
+### Parte 3 — DELETE soft (usa un id real)
+DELETE http://localhost:8080/api/v1/productos/13
+Accept: application/json
+
+### Parte 3 — DELETE id inexistente (debe devolver 404)
+DELETE http://localhost:8080/api/v1/productos/9999
+Accept: application/json
+
+### Parte 3 — GET (segunda llamada deberia salir de cache Redis)
+GET http://localhost:8080/api/v1/productos?page=0&size=10&sort=nombre,asc
+Accept: application/json

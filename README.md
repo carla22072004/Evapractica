@@ -11,7 +11,7 @@
 |-------|--------|-----------|
 | 1 | Lista | Base + entidad Producto + GET paginado |
 | 2 | Lista | POST con validación y 400 |
-| 3 | Pendiente | DELETE soft + cache Redis |
+| 3 | Lista | DELETE soft + cache Redis |
 | 4 | Pendiente | JWT + entrega (informe LaTeX, requests) |
 
 ## Ejecutar en IntelliJ IDEA (recomendado)
@@ -55,5 +55,7 @@ GET http://localhost:8080/api/v1/productos?page=0&size=10&sort=nombre,asc
 
 También está en `docs/requests.http` (plugin HTTP Client de IntelliJ).
 
-## Nota
-Redis se activa en la **Parte 3**. Por ahora la app no lo necesita.
+## Nota Redis (Parte 3)
+
+Redis para Windows ya quedó instalado como servicio (`Redis` en servicios de Windows), puerto **6379**.
+La app usa cache-aside: `@Cacheable` en el listado y `@CacheEvict` al crear/eliminar.
